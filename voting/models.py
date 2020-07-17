@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls import reverse
+from django.utils import timezone
 
 
 class Person(models.Model):
@@ -22,11 +24,25 @@ class Person(models.Model):
 
 class Voting(models.Model):
     title = models.CharField('Название', max_length=250)
-    start_date = models.DateField('Дата начала')
-    end_date = models.DateField('Дата окончания')
+    start_date = models.DateTimeField('Дата начала')
+    end_date = models.DateTimeField('Дата окончания')
     max_votes = models.PositiveIntegerField('Максимальное количество голосов', null=True, blank=True,
                                             help_text='Максимальное количество голосов для досрочного завершения.')
-    is_active = models.BooleanField(default=True, verbose_name='Активно')
+
+    def is_active(self):
+        now = timezone.now()
+
+        if now > self.end_date or now <= self.start_date:
+            return False
+
+        if self.max_votes:
+            for item in self.person_votes.all():
+                if self.max_votes <= item.votes:
+                    return False
+        return True
+
+    def get_absolute_url(self):
+        return reverse('voting_page', args=[self.id])
 
     class Meta:
         verbose_name = 'Голосование'
@@ -52,6 +68,8 @@ class PersonVotes(models.Model):
     class Meta:
         verbose_name = 'Участник голосования'
         verbose_name_plural = 'Участники голосования'
+        ordering = ('-votes',)
+        unique_together = ('person', 'voting')
 
     def __str__(self):
         return f'{self.voting} - {self.person}'

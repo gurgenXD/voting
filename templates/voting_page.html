@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ voting.title }}
+{% endblock %}
+
+{% block content %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<div class="container">
+    <br><br>
+    <div class="card">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+            <span>{{ voting.title }}</span>
+            <span>Завершится: {{ voting.end_date }}</span>
+        </h5>
+        
+        <div class="card-body">
+            <ul class="list-group mb-5">
+                {% for person in voting.person_votes.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <img src="{{ person.person.image.url }}" class="mr-3" style="width=64px; height:64px;" alt="">
+                            {{ person.person.get_full_name }}
+                        </div>
+                        {% if voting.is_active %}
+                            {% if is_voted %}
+                            <button class="btn btn-dander" disabled>Вы уже голосовали</button>
+                            {% else %}
+                            <form action="{{ voting.get_absolute_url }}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" name="person_vote_id" value="{{ person.id }}" class="btn btn-primary">Проголосовать</button>
+                            </form>
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div id="container"></div>
+
+            <script>
+                console.log('{{ voting.max_votes }}');
+                console.log('444444444');
+                Highcharts.chart('container', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: '{{ voting.title }}'
+                    },
+                    xAxis: {
+                        categories: [
+                            {% for person in voting.person_votes.all %}
+                            '{{ person.person.get_full_name }}',
+                            {% endfor %}
+                        ],
+                        title: {
+                            text: 'Персонажи'
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        {% if voting.max_votes %}
+                            max: {{ voting.max_votes }},
+                        {% endif %}
+                        title: {
+                            text: 'Голоса',
+                            align: 'high'
+                        },
+                        labels: {
+                            overflow: 'justify'
+                        }
+                    },
+                    tooltip: {
+                        valueSuffix: ' голосов'
+                    },
+                    series: [{
+                        name: 'Количество голосов',
+                        data: [
+                            {% for person in voting.person_votes.all %}
+                                {{ person.votes }},
+                            {% endfor %}
+                        ]
+                    }]
+                });
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

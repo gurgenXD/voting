@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Завершённые голосования
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mt-5">Завершённые голосования</h2>
+    <ul class="list-group mt-5">
+        {% for voting in votings %}
+            {% if not voting.is_active %}
+            <li class="list-group-item"><a href="{{ voting.get_absolute_url }}">{{ voting.title }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

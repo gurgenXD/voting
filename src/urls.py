@@ -23,6 +23,7 @@ admin.site.site_header = 'Голосование'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('voting.urls')),
 ]
 
 if settings.DEBUG:
