@@ -10,8 +10,9 @@ class PersonVotesInline(admin.TabularInline):
 
 @admin.register(Voting)
 class AdminVoting(admin.ModelAdmin):
-    list_display = ('title', 'start_date', 'end_date', 'max_votes', 'is_active')
+    list_display = ('title', 'start_date', 'end_date', 'max_votes', 'download_xlsx', 'is_active')
     search_fields = ('title',)
+    readonly_fields = ('xlsx', )
     inlines = (PersonVotesInline,)
 
     def is_active(self, obj):
@@ -20,6 +21,15 @@ class AdminVoting(admin.ModelAdmin):
         else:
             return mark_safe('<img src="/static/admin/img/icon-no.svg" alt="False">')
     is_active.short_description = 'Активно'
+
+    def download_xlsx(self, obj):
+        if obj.xlsx_status == '1':
+            return mark_safe(f'<a href="{obj.xlsx.url}">{obj.xlsx.name}</a>')
+        elif obj.xlsx_status == '2':
+            return mark_safe('<span>Генерируется...</span>')
+        else:
+            return mark_safe(f'<a href="/create-xlsx/{obj.id}">Сгенерировать XLSX файл</a>')
+    download_xlsx.short_description = 'XLSX файл'
 
 
 @admin.register(Person)

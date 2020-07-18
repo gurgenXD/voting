@@ -23,11 +23,19 @@ class Person(models.Model):
 
 
 class Voting(models.Model):
+    XLSX_STATUSES = (
+        (1, 'Сгенерирован'),
+        (2, 'Генерируется'),
+        (3, 'Сгенерировать'),
+    )
+
     title = models.CharField('Название', max_length=250)
     start_date = models.DateTimeField('Дата начала')
     end_date = models.DateTimeField('Дата окончания')
     max_votes = models.PositiveIntegerField('Максимальное количество голосов', null=True, blank=True,
                                             help_text='Максимальное количество голосов для досрочного завершения.')
+    xlsx = models.FileField(upload_to='xlsx/', verbose_name='XLSX файл', null=True, blank=True)
+    xlsx_status = models.CharField(max_length=32, choices=XLSX_STATUSES, verbose_name='Статус XLSX файла', default=3)
 
     def is_active(self):
         now = timezone.now()

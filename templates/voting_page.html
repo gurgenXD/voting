@@ -22,9 +22,13 @@
             <ul class="list-group mb-5">
                 {% for person in voting.person_votes.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
+                        <div class="d-flex justify-content-between align-items-center">
                             <img src="{{ person.person.image.url }}" class="mr-3" style="width=64px; height:64px;" alt="">
-                            {{ person.person.get_full_name }}
+                            <div>
+                                <p>ФИО: {{ person.person.get_full_name }}</p>
+                                <p>Возраст: {{ person.person.age }}</p>
+                                <p>Краткая биография: {{ person.person.biography }}</p>
+                            </div>
                         </div>
                         {% if voting.is_active %}
                             {% if is_voted %}
@@ -43,8 +47,6 @@
             <div id="container"></div>
 
             <script>
-                console.log('{{ voting.max_votes }}');
-                console.log('444444444');
                 Highcharts.chart('container', {
                     chart: {
                         type: 'bar'
