@@ -23,9 +23,9 @@ class AdminVoting(admin.ModelAdmin):
     is_active.short_description = 'Активно'
 
     def download_xlsx(self, obj):
-        if obj.xlsx_status == '1':
+        if obj.xlsx_status == 'generated':
             return mark_safe(f'<a href="{obj.xlsx.url}">{obj.xlsx.name}</a>')
-        elif obj.xlsx_status == '2':
+        elif obj.xlsx_status == 'processing':
             return mark_safe('<span>Генерируется...</span>')
         else:
             return mark_safe(f'<a href="/create-xlsx/{obj.id}">Сгенерировать XLSX файл</a>')

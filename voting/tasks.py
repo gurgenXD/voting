@@ -12,7 +12,6 @@ from django.core.mail import EmailMessage
 
 @app.task
 def create_xlsx(voting_id):
-    print('я тут')
     voting = Voting.objects.get(id=voting_id)
 
     wb = Workbook()
