@@ -1,8 +1,6 @@
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 
 class Person(models.Model):
@@ -63,21 +61,10 @@ class Voting(models.Model):
         return self.title
 
 
-@receiver(pre_save, sender=Voting)
-def save_voting(sender, instance, **kwargs):
-    if instance.end_date <= instance.start_date:
-        raise ValueError('Дата окончания должна быть больше Даты начала')
-
-
 class PersonVotes(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE, verbose_name='Персонаж', related_name='person_votes')
     voting = models.ForeignKey(Voting, on_delete=models.CASCADE, verbose_name='Голосование', related_name='person_votes')
     votes = models.PositiveIntegerField('Количество голосов', default=0)
-
-    def save(self, *args, **kwargs):
-        if not self.voting.is_active():
-            raise ValueError('Голосование не активно')
-        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Участник голосования'
@@ -87,9 +74,3 @@ class PersonVotes(models.Model):
 
     def __str__(self):
         return f'{self.voting} - {self.person}'
-
-
-@receiver(pre_save, sender=PersonVotes)
-def save_voting(sender, instance, **kwargs):
-    if not instance.voting.is_active():
-        raise ValueError('Голосование не активно')

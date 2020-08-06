@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.utils.html import mark_safe
 from voting.models import Person, PersonVotes, Voting
-from voting.forms import VotingAdminForm
 
 
 class PersonVotesInline(admin.TabularInline):
@@ -15,7 +14,6 @@ class VotingAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     readonly_fields = ('xlsx', )
     inlines = (PersonVotesInline,)
-    form = VotingAdminForm
 
     def is_active(self, obj):
         if obj.is_active():

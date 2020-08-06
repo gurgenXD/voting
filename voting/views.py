@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from django.contrib import messages
 from voting.models import Voting, PersonVotes
 from voting.tasks import create_xlsx, send_email
 
@@ -26,14 +25,10 @@ class VotingPageView(View):
         if voting_id not in is_voted_list:
             person_vote_id = request.POST.get('person_vote_id')
             person_vote = PersonVotes.objects.get(id=int(person_vote_id))
-            # Перед добавление голоса, проверяю активное ли голосование
-            if person_vote.voting.is_active():
-                person_vote.votes += 1
-                person_vote.save()
-                is_voted_list.append(voting_id)
-                request.session.modified = True
-            else:
-                messages.error(request, 'Голосование не активно')
+            person_vote.votes += 1
+            person_vote.save()
+            is_voted_list.append(voting_id)
+            request.session.modified = True
 
         return redirect(request.path)
 
